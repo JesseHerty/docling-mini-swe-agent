@@ -1,0 +1,31 @@
+name: "Run Docs CD"
+
+on:
+  push:
+    branches:
+      - "main"
+
+
+jobs:
+  build-docs:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/docs.yml
+    with:
+      deploy: true
+  deploy-docs:
+    needs: build-docs
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
